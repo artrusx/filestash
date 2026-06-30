@@ -49,12 +49,23 @@ func WOPIHandler_CheckFileInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	WOPIExecute(w, r)(func(ctx *App, fullpath string, w http.ResponseWriter) {
 		w.Header().Set("Content-Type", "application/json")
+		username := "Unknown"
+		isAnonymous := true
+		if ctx.Session != nil {
+			if ctx.Session["username"] != "" {
+				username = ctx.Session["username"]
+				isAnonymous = false
+			} else if ctx.Session["user"] != "" {
+				username = ctx.Session["user"]
+				isAnonymous = false
+			}
+		}
 		if err := json.NewEncoder(w).Encode(map[string]any{
 			"BaseFileName":     filepath.Base(fullpath),
-			"UserFriendlyName": "Unknown",
+			"UserFriendlyName": username,
 			"UserCanWrite":     model.CanEdit(ctx),
 			"IsAdminUser":      false,
-			"IsAnonymousUser":  true,
+			"IsAnonymousUser":  isAnonymous,
 		}); err != nil {
 			SendErrorResult(w, err)
 			return
