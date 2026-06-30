@@ -82,6 +82,7 @@ func (smb Samba) Init(params map[string]string, app *App) (IBackend, error) {
 			Password: params["password"],
 			Domain:   params["domain"],
 		},
+		Options: smb2.ShareMaskAll | smb2.ShareMaskDFS,
 	}).Dial(conn)
 	if err != nil {
 		Log.Debug("plg_backend_samba::smbdial host[%s] err[%s] username[%s] domain[%s]", host, err.Error(), params["username"], params["domain"])
